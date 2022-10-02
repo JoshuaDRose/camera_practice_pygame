@@ -58,6 +58,9 @@ class CameraGroup(pygame.sprite.Group):
         self.ground_surf = pygame.image.load('graphics/ground.png').convert_alpha()
         self.ground_rect = self.ground_surf.get_rect(topleft=(0,0))
     
+        # camera speed
+        self.keyboard_speed = 5
+
     def center_target_camera(self, target):
         self.offset.x = target.rect.centerx - self.half_w
         self.offset.y = target.rect.centery - self.half_h
@@ -75,7 +78,60 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.x = self.camera_rect.left - self.camera_borders['left'] 
         self.offset.y = self.camera_rect.top - self.camera_borders['top'] 
 
+    def keyboard_control(self):
+        keys = pygame.key.get_pressed()
+        # if keys[pygame.K_a]:
+        #     self.offset.x -= self.keyboard_speed
+        # if keys[pygame.K_d]:
+        #     self.offset.x += self.keyboard_speed
+        # if keys[pygame.K_w]:
+        #     self.offset.y -= self.keyboard_speed
+        # if keys[pygame.K_s]:
+        #     self.offset.y += self.keyboard_speed
+
+        # keyboard control + box camera
+        if keys[pygame.K_a]:
+            self.camera_rect.x -= self.keyboard_speed
+        if keys[pygame.K_d]:
+            self.camera_rect.x += self.keyboard_speed
+        if keys[pygame.K_w]:
+            self.camera_rect.y -= self.keyboard_speed
+        if keys[pygame.K_s]:
+            self.camera_rect.y += self.keyboard_speed
+
+        self.offset.x = self.camera_rect.left - self.camera_borders['left'] 
+        self.offset.y = self.camera_rect.top - self.camera_borders['top'] 
+
+    def keyboard_control2(self, target):
+        # 이게 더 나은거 아냐! (이건 box camera를 keyboard_control에 붙여서 구현!)
+        keys = pygame.key.get_pressed()
+
+        # keyboard control + box camera
+        if keys[pygame.K_a]:
+            self.camera_rect.x -= self.keyboard_speed
+        if keys[pygame.K_d]:
+            self.camera_rect.x += self.keyboard_speed
+        if keys[pygame.K_w]:
+            self.camera_rect.y -= self.keyboard_speed
+        if keys[pygame.K_s]:
+            self.camera_rect.y += self.keyboard_speed
+
+        if target.rect.left < self.camera_rect.left:
+            self.camera_rect.left = target.rect.left
+        if target.rect.right > self.camera_rect.right:
+            self.camera_rect.right = target.rect.right
+        if target.rect.top < self.camera_rect.top:
+            self.camera_rect.top = target.rect.top
+        if target.rect.bottom > self.camera_rect.bottom:
+            self.camera_rect.bottom = target.rect.bottom
+
+        self.offset.x = self.camera_rect.left - self.camera_borders['left'] 
+        self.offset.y = self.camera_rect.top - self.camera_borders['top'] 
+
     def custom_draw(self, player):
+        # key camera
+        self.keyboard_control()
+
         # box camera
         self.box_target_camera(player)
 
